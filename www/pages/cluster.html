@@ -1,0 +1,148 @@
+<p>
+	Die vorhandenen RasPi sollen in einem Cluster zusammengelegt werden und dann gemeinsam für alle Aufgaben im Netz arbeiten.<br>
+	Aktuell sind das ein Webserver, IOBroker, NAS01 (wird ersetzt durch reinen Samba), der Musikserver und die WD-NAS.<br>
+	Alle diese müssen dann letztlich ja als Container im Cluster mit verteilter Last laufen.<br>
+	Da gerade 2 RasPi4 zur Verfügung stehen, davon war einer die NAS01, kann im ersten Schritt ein Cluster mit einem Master und einem Node entstehen, der dann im ersten Schritt den Samba-Server hostet.<br>
+	Im zweiten Schritt kannn Willibald abgelöst werden, also vorher auf dem Cluster einen Webserver installieren.
+</p>
+
+<p>
+	Nach ein paar Recherchen ist die Entscheidung gefallen, den cluster mit Proxmox zu bauen.<br>
+	Wie weit das tatsächlich meinen Ansprüchen genügt, wird sich erst in Zukunft zeigen!<br><br>
+	Grund für die Entscheidung war, dass in Foren zu lesen war, dass Kubernetes zu Umständlich zu konfigurieren ist und keine VMs kann. Mit Proxmox besteht zumindest die Möglichkeit, auch VMs zu installieren.<br>
+	Andere Cluster sind beim Lesen aus der Wertung gefallen.
+</p>
+
+<p>
+	Bare-Metal-Cluster: Bare-Metal ist ein rein physischer Server, früher auch Dedicated Server genannt.<br>
+	Der Proxmox-Cluster wird zuerst mit 1 Maschine konfiguriert, dann die 2. hinzugefügt. Weitere folgen dann, wenn die Anwendungen umgezogen sind! 
+</p>
+
+
+<p>
+	Die einzelnen Raspberrys werden mit cluster01 - clusternn numeriert.
+</p>
+
+<p>
+	node01 (PI 4) - 192.168.143.141<br>
+	Das ist der erste Knoten im Cluster, installiert auf eine SSD.
+</p>
+
+<p>
+	node02 (PI 4) - 192.168.143.142<br>
+	Das ist der zweite Knoten im Cluster, installiert auf SD-Karte.
+</p>
+
+<h1>Feste IP vergeben</h1>
+
+<p>
+	sudo nmcli -p connection show<br>
+	sudo nmcli c mod "Wired connection 1" ipv4.addresses 192.168.143.142/24 ipv4.method manual<br>
+	sudo nmcli con mod "Wired connection 1" ipv4.gateway 192.168.143.17<br>
+	sudo nmcli con mod "Wired connection 1" ipv4.dns "192.168.143.17"<br>
+</p>
+
+
+<p>
+	
+	Hostnamen setzen (/etc/hostname)<br>
+
+	Falls im Imager bereits der Hostname gesetzt wurde kann dieser Punkt übersprungen werden.<br>
+	<br>
+	Als Erstes setzen wir einen Hostnamen für unseren Proxmox Node. Dafür editieren wir die Datei /etc/hostname.<br>
+	<br>
+	sudo vi /etc/hostname<br>
+	<br>
+	Hier wird nun der gewünschte Hostname eingetragen. In meinem Fall habe ich mich für ClusterPi-1 entschieden.<br>
+	<br>
+	Der zweite Raspberry wäre dementsprechend ClusterPi-2, u.s.w.<br>
+	<br>
+	<br>
+	Hosts eintragen (/etc/hosts)<br>
+</p>
+
+<p>
+	Nun werden auf jedem Raspberry die Hostnamen aller Cluster Nodes eingetragen.<br>
+	<br>
+	Dazu editieren wir die Datei /etc/hosts.<br>
+	<br>
+	Am Anfang sieht diese ungefähr so aus:<br>
+	<br>
+	127.0.0.1       localhost<br>
+	::1             localhost ip6-localhost ip6-loopback<br>
+	ff02::1         ip6-allnodes<br>
+	ff02::2         ip6-allrouters<br>
+	<br>
+	127.0.1.1       ClusterPi-1<br>
+	<br>
+	Die IPv6 Einträge können ruhigen gewissen gelöscht werden.<br>
+	<br>
+	Am wichtigsten ist es aber den Eintrag "127.0.1.1 ClusterPi-1" zu entfernen, da der Cluster mit den absoluten Adressen arbeiten soll. [1]<br>
+	<br>
+	Danach werden die Hostnamen der Nodes hinzugefügt, so dass es am Ende so aussehen sollte:<br>
+	<br>
+	127.0.0.1       localhost<br>
+	192.168.2.81    ClusterPi-1<br>
+	192.168.2.82    ClusterPi-2<br>
+	192.168.2.83    ClusterPi-3<br>
+	192.168.2.84    ClusterPi-4<br>
+	<br>
+	Die IP-Adressen müssen natürlich dem entsprechen was ihr vorher konfiguriert habt.<br>
+</p>
+
+<p>
+</p>
+
+<h1>Proxmox installieren</h1>
+<p>
+	Da die andere Anleitung nicht funktioniert hat, jetzt nach Bacchman-lan.de:<br>
+	<br>
+	Proxmox 8 installieren (siehe Proxmox-Arm Wiki)<br>
+	# Proxmox VE Repository key hinzufügen<br>
+	# Certificate Error - curl https://global.mirrors.apqa.cn/proxmox/debian/pveport.gpg -o /etc/apt/trusted.gpg.d/pveport.gpg <br>
+	curl https://mirrors.apqa.cn/proxmox/debian/pveport.gpg -o /etc/apt/trusted.gpg.d/pveport.gpg <br>
+	# Proxmox 8 VE Repository hinzufügen<br>
+	# Certificate Error - echo "deb https://global.mirrors.apqa.cn/proxmox/debian/pve bookworm port" > /etc/apt/sources.list.d/pveport.list<br>
+	echo "deb https://mirrors.apqa.cn/proxmox/debian/pve bookworm port" > /etc/apt/sources.list.d/pveport.list<br>
+	# Repository und System updaten<br>
+	apt update && apt full-upgrade<br>
+	# Proxmox VE Pakete installieren<br>
+	apt install proxmox-ve postfix open-iscsi<br>
+	reboot<br>
+</p>
+
+<p>
+	Danach den Knoten mit IP:8006 aufrufen und mit root einloggen. --> Funktioniert.
+</p>
+
+<p>
+</p>
+
+<p>
+</p>
+
+<p>
+	Quellenverzeichnis:<br>
+	<br>
+	<ul>
+	
+		<li><a target = "_blank" href="https://www.bitblokes.de/statische-ip-adresse-bei-raspberry-pi-os-bookworm/">Raspberry PI OS Bookworm - Statische IP vergeben</a></li>
+		<li><a target = "_blank" href="https://www.bachmann-lan.de/proxmox-8-auf-dem-raspberry-pi-4-installieren/">Bachmann</a></li>
+		<li><a target = "_blank" href="https://wiki.toenniges.net/wiki/Proxmox_auf_Raspberry_Pi_(Pimox)">Proxmox auf Raspberry PI (Pimox)</a></li>
+		
+
+
+
+
+
+		<li><a target = "_blank" href="https://tutorials-raspberrypi.de/supercomputer-raspberry-pi-kubernetes-cluster/">Supercomputer - Raspberry PI Kubernetes Cluster</a></li>
+		<li><a target = "_blank" href="https://www.heise.de/ratgeber/Kubernetes-Cluster-aus-vier-Raspberry-Pi-bauen-10031618.html?seite=all"></a>Heise - Kubernetes Cluster mit 4 PI. (K3S, ohne Master?)</li>
+		<li><a target = "_blank" href="https://jabbalab.de/kubernetes-cluster/">Jabbalab</a></li>
+		<li><a target = "_blank" href="https://schroederdennis.de/tutorial-howto/raspberry-pi-cluster-mit-docker-swarm-hochverfuegbar-failover/">Dennis Schroeder - Docker Swarm (Video)</a></li>
+		<li><a target = "_blank" href="https://magpi.raspberrypi.com/articles/build-a-raspberry-pi-cluster-computer">MagPi - Build a Raspberry PI Cluster Computer</a></li>
+		<li><a target = "_blank" href="https://developer-blog.net/ein-server-cluster-mit-raspberry-pis/">Ein Server Cluster mit Raspberry Pis</a></li>
+		<li><a target = "_blank" href=""></a></li>
+		<li><a target = "_blank" href=""></a></li>
+	</ul>
+</p>
+

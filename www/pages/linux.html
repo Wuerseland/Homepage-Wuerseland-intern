@@ -1,0 +1,36 @@
+Hier nur ein paar Linux-Befehle, auch Raspi-spezifisch.
+
+--> Seite noch in eine Tabelle umbauen. Sollte auch dabei stehen, was Raspberry-spezifisch ist!
+
+
+<h1>Raspberry PI</h1>
+
+<h2>Modell herausfinden</h2>
+
+cat /sys/firmware/devicetree/base/model<br>
+cat /etc/os-release
+
+
+<h2>Hardwareinformationen</h2>
+
+sudo apt-get install lshw<br>
+lshw
+
+<h2>Betriebssystemupdate</h2>
+
+sudo apt update<br>
+sudo apt dist-upgrade -y<br>
+sudo rpi-update<br>
+sudo reboot<br>
+sudo nano /etc/apt/sources.list<br>
+Suche diese Zeile: <br>
+deb http://raspbian.raspberrypi.org/raspbian/ buster main contrib non-free rpi<br>
+.. und ersetze sie durch diese ('buster' durch 'bullseye' ersetzen):<br>
+deb http://raspbian.raspberrypi.org/raspbian/ bullseye main contrib non-free rpi<br>
+sudo apt update<br>
+sudo apt dist-upgrade<br>
+sudo apt autoclean<br>
+sudo reboot<br>
+
+
+

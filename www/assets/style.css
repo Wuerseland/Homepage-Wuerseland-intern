@@ -1,0 +1,333 @@
+:root{
+  --max-width:1200px;
+  --sidebar-width:240px;
+  --gap:24px;
+  --page-padding:24px;
+  --bg:#f6f7f9;
+  --card:#ffffff;
+  --accent:#0b66ff;
+  --text:#111;
+  --muted:#666;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);background:var(--bg)}
+#app{min-height:100%;display:flex;justify-content:center;padding:32px}
+
+/* Container: volle Breite (zentriert), Content sitzt rechts von fixed Sidebar */
+#app{min-height:100%;display:block;padding:32px;background:var(--bg)}
+.container{
+  width:100%;
+  max-width:var(--max-width);
+  margin:0 auto;
+  position:relative;
+}
+
+
+/* Fixed Sidebar: immer links, bleibt beim Scrollen */
+:root{
+  --sidebar-width:240px;
+  --page-gap:32px;
+  --max-width:1200px;
+}
+#sidebar{
+  position:fixed;
+  left:var(--page-gap);
+  top:32px;
+  width:var(--sidebar-width);
+  z-index:1002;
+}
+main{
+  margin-left: calc(var(--sidebar-width) + var(--page-gap) + 8px);
+  padding-right:var(--page-gap);
+}
+
+
+/* Card/Content: volle Breite innerhalb main, innerer max-width für Lesbarkeit */
+#content.card{
+  background:var(--card);
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 8px 24px rgba(12,20,40,0.06);
+  min-height:360px;
+  width:100%;
+}
+.content-inner{max-width:900px;margin:0}
+
+/* Responsive: bei schmalen Bildschirmen wird Sidebar nicht fixed, sondern Drawer/Hamburger */
+@media (max-width:1000px){
+  /* Sidebar wird Teil des normalen Flows (overlay/drawer handled von bisherigen Regeln) */
+  #sidebar{
+    position:fixed; /* keep fixed for drawer */
+    left:0;
+    transform:translateX(-120%);
+    transition:transform .22s ease;
+    margin:20px 0 0 10px;
+  }
+  #sidebar.open{transform:translateX(0)}
+  main{margin-left:0;padding:16px}
+  #menu-toggle{display:inline-block}
+}
+
+
+/* Navigation intern */
+#sidebar .brand{font-weight:700;margin-bottom:8px}
+#sidebar nav{display:flex;flex-direction:column;gap:6px}
+#sidebar nav a{
+  display:block;
+  padding:10px 12px;
+  color:var(--text);
+  text-decoration:none;
+  border-radius:8px;
+  font-weight:600;
+  transition:background .12s, color .12s;
+}
+#sidebar nav a:hover{background:rgba(11,102,255,0.06)}
+#sidebar nav a.active{background:linear-gradient(90deg,var(--accent),#4f8bff);color:#fff}
+
+/* MAIN content area - nimmt restliche Breite, mit konsistenter Box */
+main{min-width:0}
+.topline{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+#menu-toggle{display:none;background:transparent;border:0;font-size:20px;cursor:pointer}
+
+/* Card / Inhalt: volle verfügbare Breite innerhalb des Content-Bereichs,
+   mit innerem Max-Content, damit kurze Texte nicht zu schmal wirken */
+#content.card{
+  background:var(--card);
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 8px 24px rgba(12,20,40,0.06);
+  min-height:360px;           /* sorgt dafür, dass Content-Bereich sichtbar bleibt */
+  width:100%;
+}
+
+/* Innerer Layout-Container für Lesbarkeit: beschränkt Textbreite */
+.content-inner{
+  max-width:900px;
+  margin:0;
+}
+
+/* Responsive: Sidebar wird Drawer auf kleinen Bildschirmen */
+@media (max-width:900px){
+  .container{grid-template-columns:1fr}
+  #sidebar{
+    position:fixed;
+    left:0; top:0; bottom:0;
+    width:var(--sidebar-width);
+    transform:translateX(-120%);
+    transition:transform .22s ease;
+    z-index:1001;
+    margin:20px 0 0 10px;
+  }
+  #sidebar.open{transform:translateX(0)}
+  #overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,0.25);z-index:1000;opacity:0;pointer-events:none;transition:opacity .2s}
+  #overlay.show{opacity:1;pointer-events:auto}
+  #menu-toggle{display:inline-block}
+  /* Content sollte immer mindestens die Höhe des Viewports minus Padding haben */
+  #content.card{min-height:calc(100vh - 120px)}
+}
+
+/* Kleine kosmetische Helfer */
+h1,h2{margin:0 0 12px 0}
+p{margin:0 0 12px 0;color:var(--muted)}
+
+
+
+
+
+
+/* -------------------------------------------------------------------------------- */
+/* ap 20260516 Tabellenelemente hinzugefügt. */
+.table {
+  display: table;
+  table-layout: fixed; width: 100%;
+  border-collapse: collapse; /* für zusammenhängende Ränder */
+  table-layout: auto;       /* oder fixed für gleich breite Spalten */
+  font-family: system-ui, Arial, sans-serif;
+  font-size: 14px;
+  background: white;
+}
+.table .th:nth-child(1), .table .td:nth-child(1) { width: 130px; } /* erste Spalte */
+.table .th:nth-child(2), .table .td:nth-child(2) { width: 250px; } /* zweite Spalte */
+.table .th:nth-child(3), .table .td:nth-child(3) { width: calc(100% - 380px); } /* Rest */
+
+/* Zeile */
+.tr {
+  display: table-row;
+}
+
+/* Kopfzellen */
+.th {
+  display: table-cell;
+  font-weight: 600;
+  padding: 10px 12px;
+  background: #f3f4f6;
+  border: 1px solid #ddd; /* Trennlinien */
+  /* border-bottom: 1px solid #e5e7eb; */
+  vertical-align: middle;
+}
+
+/* Datenzellen */
+.td {
+  display: table-cell;
+  padding: 10px 12px;
+  border: 1px solid #ddd; /* Trennlinien */
+  /* border-bottom: 1px solid #eaeaea; */
+  vertical-align: top;
+  word-break: break-word; /* lange Worte umbrechen */
+}
+
+/* Optional: erste Zeile als Header styling, falls .tr:first-child nicht verwendet wird */
+.table .tr:first-child .th { background:#eef2ff; }
+
+/* Responsive: bei sehr schmalen Bildschirmen in "stacked" Ansicht wechseln */
+@media (max-width: 640px) {
+  .table { display: block; }
+  .tr { display: block; margin-bottom: 12px; border:1px solid #eee; border-radius:6px; overflow:hidden; }
+  .th { display: none; } /* Kopfzeile ausblenden, stattdessen einzelne Zeilen mit Label */
+  .td { display: block; padding: 8px 12px; border-bottom: none; }
+  /* Wenn du Labels pro Zelle darstellen willst, nutze data-attribute und ::before */
+  .td[data-label]::before {
+    content: attr(data-label) ": ";
+    font-weight:600;
+    display:inline-block;
+    width:130px;
+  }
+}
+
+/* -------------------------------------------------------------------------------- */
+
+/* ############################################################ */
+/* bereich fuss */
+/* ############################################################ */
+
+.section-fusstop {
+	width:100%;
+	background:#efefef;
+	margin:0;
+	padding:0
+}
+
+.section-fuss {
+	width:100%;
+	background:#8F8F8F;/* IE9*/
+	/* background:linear-gradient(to right, #8f8f8f, #CECECE, #8F8F8F); */
+	background:linear-gradient(to right, azure, bisque, azure);
+	
+	color:#000;
+	border-top:solid .4rem aquamarine; /* border-top:solid .8rem firebrick; */
+
+	position:fixed;
+	left:0;
+	right:0;
+	bottom:0;
+	z-index:1000;
+	/* background:#fff;               /* Hintergrundfarbe */
+	box-shadow:0 -4px 12px rgba(0,0,0,0.07);
+
+}
+
+.fuss-content {
+	text-align:center;
+	margin: 0rem auto;
+	/* padding:3rem 0 ; */
+	padding:.5rem 0 ;
+	
+	max-width:1200px;
+	/* margin:0 auto; */
+	/* padding:12px 24px; */
+	display:flex;
+	justify-content:space-between;
+	align-items:center;	
+	
+}
+
+
+.fusstop-content {
+	text-align:center;
+	margin: 0rem auto;
+	padding:0rem 0 ;
+}
+
+
+
+#fusstop ul.pagination {
+	display:inline-block;
+	margin:1rem 0 ;
+	padding:0rem;
+	font-family:arial,sans-serif,helvetica;
+}
+
+#fusstop .pagination li {
+	list-style-type : none;
+	display:inline-block;
+	margin:0rem -.14rem;
+	padding:.1rem 0rem;
+}
+
+#fusstop .pagination li a ,
+#fusstop .pagination li a i {
+	display:inline-block;
+	background:silver;
+	color:#000;
+	width:3rem;
+	height:1rem; /* height:3rem; */
+	line-height:3rem; /* line-height:3rem; */
+	font-size:1.8rem;
+	border-radius:.5rem;
+	margin:0;
+	text-align:center;
+	text-decoration:none;
+	transition:transform .3s ease-out;
+}
+
+#fusstop .pagination li a:hover ,
+#fusstop .pagination li a:hover i {
+	background:firebrick;
+	color:#fff;
+}
+
+#fusstop .pagination  #aktuell  a,
+#fusstop .pagination  #aktuell  a i {
+	background:#4F4F4F;
+	color:#fff;
+}
+
+
+
+#fuss ul {
+	text-align:center;
+	padding:0rem;
+	margin:0;
+}
+
+#fuss li  {
+	display:inline;
+	list-style:none;
+	padding:0rem 0rem;
+	margin:0;
+}
+
+#fuss li a {
+	text-decoration : none;
+	font-size:1.4rem;
+	height:2.4rem;
+	line-height:2.4rem;
+	letter-spacing:0rem;
+	padding:.3rem .7rem .3rem .7rem;
+	margin: 0;
+	color:#000;
+	background:white;
+	border-radius:.6rem;
+	box-shadow:0 0 1px black;
+}
+
+#fuss li a:hover  {
+	background:#F0F0F0;
+	text-decoration:none;
+}
+
+/* -------------------------------------------------------------------------------- */
+
+
+
