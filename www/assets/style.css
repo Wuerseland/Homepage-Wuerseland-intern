@@ -85,6 +85,16 @@ main{
 #sidebar nav a:hover{background:rgba(11,102,255,0.06)}
 #sidebar nav a.active{background:linear-gradient(90deg,var(--accent),#4f8bff);color:#fff}
 
+
+/* 20260709 Hinzugefügt. --> */
+.hidden { display: none; }
+.submenu { margin-left: 1rem; }
+/* 20260709 Hinzugefügt. <-- */
+
+
+
+
+
 /* MAIN content area - nimmt restliche Breite, mit konsistenter Box */
 main{min-width:0}
 .topline{display:flex;align-items:center;gap:12px;margin-bottom:12px}

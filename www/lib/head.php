@@ -10,5 +10,6 @@
 		<meta name="description" content="homepage, dokument, webpage, page, web, netz" >
 
 		<link rel="stylesheet" href="assets/style.css">
+		
 		<title>Würseland lokal</title>
 

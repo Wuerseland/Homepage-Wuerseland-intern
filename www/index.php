@@ -8,11 +8,30 @@
 
 		<!-- Zuerst einmal Übergabeparameter lesen. --> 
 		<?php 
+			/* 20260709 -->
 			$ziel = $_GET["page"];
 			if ($ziel == "")
 				$ziel = './pages/home.html';
 			// echo 'page: '.$ziel.'<br>';
 			$subnav = $_GET["subnav"];
+			*/
+			$ziel = $_GET["page"] ?? '';
+			if ($ziel === '') {
+			  $ziel = './pages/home.html';
+			}
+
+			// Nur Seiten aus ./pages/ erlauben
+			$ziel = ltrim($ziel, '/');          // führende / weg
+			$ziel = str_replace('\\', '/', $ziel);
+
+			$allowedBase = realpath(__DIR__ . '/pages');
+			$targetPath  = realpath(__DIR__ . '/' . $ziel);
+
+			// Fallback, falls ungültig
+			if ($targetPath === false || strncmp($targetPath, $allowedBase, strlen($allowedBase)) !== 0) {
+			  $ziel = './pages/home.html';
+			}
+			// 20260709 <--
 		?>
 
 
@@ -47,6 +66,7 @@
 		<?php include ($lib.'footer.php'); ?>
 
 		<script src="assets/app.js" defer></script>
+		<!--script src="assets/menu-toggle.js" defer></script-->
 
 	</body>
 </html>
